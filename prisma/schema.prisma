@@ -1,0 +1,337 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------- Identity ----------
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+  carts        Cart[]
+  orders       Order[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ---------- Catalog (Printify read model) ----------
+
+model Product {
+  id              String            @id @default(cuid())
+  printifyId      String            @unique
+  title           String
+  slug            String            @unique
+  description     String            @default("")
+  tags            String[]          @default([])
+  options         Json              @default("[]")
+  visible         Boolean           @default(true)
+  blueprintId     Int?
+  printProviderId Int?
+  currency        String
+  minPriceMinor   Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  syncedAt        DateTime          @default(now())
+
+  images     ProductImage[]
+  variants   ProductVariant[]
+  categories ProductCategory[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+}
+model ProductImage {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  src        String
+  position   Int      @default(0)
+  isDefault  Boolean  @default(false)
+  variantIds Int[]    @default([])
+
+  @@unique([productId, src])
+  @@index([productId, position])
+}
+
+model ProductVariant {
+  id                String   @id @default(cuid())
+  productId         String
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  printifyVariantId Int
+  title             String
+  sku               String?
+  priceMinor        Int
+  costMinor         Int      @default(0)
+  currency          String
+  isEnabled         Boolean  @default(true)
+  isAvailable       Boolean  @default(true)
+  isDefault         Boolean  @default(false)
+  colorName         String?
+  sizeName          String?
+  optionValueIds    Int[]    @default([])
+  options           Json     @default("{}")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@unique([productId, printifyVariantId])
+  @@index([productId, isAvailable, isEnabled])
+}
+
+model Category {
+  id       String            @id @default(cuid())
+  slug     String            @unique
+  name     String
+  products ProductCategory[]
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+  @@index([categoryId])
+}
+
+// ---------- Cart ----------
+
+model Cart {
+  id        String     @id @default(cuid())
+  token     String     @unique
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+}
+
+model CartItem {
+  id             String   @id @default(cuid())
+  cartId         String
+  cart           Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity       Int
+  unitPriceMinor Int
+  currency       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([cartId, variantId])
+  @@index([variantId])
+}
+
+// ---------- Orders ----------
+
+enum OrderStatus {
+  PENDING
+  PAYMENT_PENDING
+  PAID
+  FULFILLMENT_PENDING
+  IN_PRODUCTION
+  SHIPPED
+  DELIVERED
+  PAYMENT_FAILED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+// Fulfillment is a separate state machine from payment. A successful PayPal
+// payment (Order.status = PAID) is never rewritten by fulfillment progress.
+enum FulfillmentStatus {
+  PENDING
+  SUBMITTED
+  ON_HOLD
+  SENDING_TO_PRODUCTION
+  IN_PRODUCTION
+  PARTIALLY_FULFILLED
+  FULFILLED
+  CANCELLED
+  ACTION_REQUIRED
+  UNFULFILLABLE
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  orderNumber      String      @unique
+  userId           String?
+  user             User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email            String
+status          OrderStatus @default(PENDING)
+  currency        String
+  cartId          String?
+
+  subtotalMinor    Int
+  shippingMinor    Int
+  totalMinor       Int
+
+  recipientName    String
+  address1         String
+  address2         String?
+  city             String
+  region           String?
+  postalCode       String
+  country          String
+  phone            String?
+
+  paypalOrderId    String?     @unique
+  printifyOrderId  String?     @unique
+  printifyStatus   String?
+  trackingCarrier  String?
+  trackingNumber   String?
+  trackingUrl      String?
+  /**
+   * Cryptographically random token behind the customer tracking link
+   * (/track-order/<token>). Never a database id and never derived from the
+   * order number; regenerated if the link must be revoked.
+   */
+  trackingToken    String?   @unique
+  /** Set when Printify reports an authoritative delivered timestamp. */
+  deliveredAt      DateTime?
+
+  fulfillmentStatus       FulfillmentStatus @default(PENDING)
+  printifySubmittedAt     DateTime?
+  printifySentToProductionAt DateTime?
+  printifyFulfilledAt     DateTime?
+  printifyLastSyncedAt    DateTime?
+  fulfillmentError        String?
+  fulfillmentAttempts     Int               @default(0)
+
+  // Post-order shipping reconciliation (observability only). The checkout quote
+  // remains the customer-facing authority; these fields only record what
+  // Printify quoted vs actually billed so divergences can be diagnosed later.
+  // All amounts are in the Printify source currency (PRINTIFY_COST_CURRENCY).
+  printifyQuotedShippingMinor     Int?
+  printifyQuotedShippingCurrency  String?
+  printifyActualShippingMinor     Int?
+  printifyActualShippingCurrency  String?
+  printifyShippingDeltaMinor      Int?
+  // "PENDING" | "RECONCILED" | "UNAVAILABLE"
+  printifyShippingReconcileStatus String?
+  printifyShippingReconciledAt    DateTime?
+
+  placedAt         DateTime?
+  paidAt           DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  items    OrderItem[]
+  payment  Payment?
+}
+
+model OrderItem {
+  id                 String  @id @default(cuid())
+  orderId            String
+  order              Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId          String
+  product            Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId          String
+  variant            ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  printifyProductId  String
+  printifyVariantId  Int
+  title              String
+  variantTitle       String
+  sku                String?
+  quantity           Int
+  unitPriceMinor     Int
+  totalPriceMinor    Int
+  currency           String
+
+  @@index([orderId])
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  orderId            String        @unique
+  order              Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider           String
+  providerOrderId    String
+  providerPaymentId  String?
+  status             PaymentStatus @default(PENDING)
+  amountMinor        Int
+  currency           String
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  completedAt        DateTime?
+
+  @@unique([provider, providerOrderId])
+  @@index([providerOrderId])
+}
+
+// ---------- Reliability ----------
+
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  eventId     String
+  type        String
+  status      String    @default("received")
+  payload     Json?
+  error       String?
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+
+  @@unique([provider, eventId])
+  @@index([receivedAt])
+}
+
+model CatalogSyncRun {
+  id             String    @id @default(cuid())
+  type           String
+  status         String    @default("running")
+  productsSeen   Int       @default(0)
+  productsUpserted Int     @default(0)
+  error          String?
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  kind      String
+  recipient String
+  subject   String
+  /** "sending" | "sent" | "failed" */
+  status    String
+  /**
+   * Deterministic idempotency key (e.g. `order-confirmed:{orderId}`). The
+   * unique constraint is what makes duplicate triggers harmless: a second
+   * attempt for the same event can never create a second log — and therefore
+   * never sends a second email.
+   */
+  dedupeKey String?  @unique
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
