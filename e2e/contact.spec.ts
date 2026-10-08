@@ -30,7 +30,7 @@ test("validates the form server-side", async ({ page }) => {
 });
 
 test("submits a message and emails the store and the customer", async ({ page }) => {
-  const email = `e2e-customer-${Date.now()}@example.com`;
+  const email = `e2e-customer-${Date.now()}zitsu.darkhub.dev`;
   await page.goto("/contact");
 
   await page.getByLabel("Name").fill("Jane Smith");
