@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
-    "mtime": 1791407502.3165877,
-    "ast_hash": "e5cb46ee7574c125512a644ae9aed95e",
+    "mtime": 1791445291.3861601,
+    "ast_hash": "99f8d326d60cd6d4ae1f3cdfccc02468",
     "semantic_hash": ""
   },
   "pnpm-workspace.yaml": {
@@ -605,8 +605,8 @@
     "semantic_hash": ""
   },
   "vercel.json": {
-    "mtime": 1791406859.0359685,
-    "ast_hash": "4b41e5ce7f71e7cc35beba967f69b05d",
+    "mtime": 1791445267.6549816,
+    "ast_hash": "76cd7e6d7842a57af0cdfba24c2eaf98",
     "semantic_hash": ""
   },
   "src/lib/checkout/profitability.ts": {

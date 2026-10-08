@@ -7,7 +7,7 @@
     },
     {
       "path": "/api/cron/fulfillment-retry",
-      "schedule": "15 * * * *"
+      "schedule": "15 3 * * *"
     }
   ]
 }
