@@ -6,10 +6,10 @@ export function ProductGridSkeleton() {
       {Array.from({ length: 8 }).map((_, index) => (
         <div
           key={index}
-          className="overflow-hidden rounded-xl border border-line bg-surface"
+          className="overflow-hidden rounded-2xl border border-line bg-surface"
           aria-hidden="true"
         >
-          <div className="aspect-square animate-pulse bg-canvas" />
+          <div className="aspect-square animate-pulse bg-brand-50" />
           <div className="space-y-2 p-4">
             <div className={cn("h-3 rounded bg-canvas", index % 2 === 0 ? "w-3/4" : "w-1/2")} />
             <div className="h-3 w-1/3 rounded bg-canvas" />

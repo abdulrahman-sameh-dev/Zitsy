@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 
+import { LogoMark } from "@/components/brand/logo";
 import {
   clearCartAction,
   removeCartItem,
@@ -164,6 +165,7 @@ export function CartView({ cart }: { cart: CartViewModel }) {
   if (cart.lines.length === 0) {
     return (
       <div className="container-page flex flex-col items-center gap-5 py-24 text-center">
+        <LogoMark className="h-14 w-14 text-brand-200" />
         <h1 className="text-2xl font-semibold tracking-tight text-ink">
           Your cart is empty
         </h1>
@@ -171,12 +173,14 @@ export function CartView({ cart }: { cart: CartViewModel }) {
           Browse the catalogue and add something you like. Your cart is saved on
           this device.
         </p>
-        <Link
-          href="/shop"
-          className="rounded-md bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-        >
-          Browse products
-        </Link>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/shop" className="btn-primary">
+            Browse products
+          </Link>
+          <Link href="/track-order" className="btn-secondary">
+            Track an existing order
+          </Link>
+        </div>
       </div>
     );
   }
@@ -219,6 +223,9 @@ export function CartView({ cart }: { cart: CartViewModel }) {
           {formatMoney(cart.subtotalMinor, cart.currency)}
         </span>
       </div>
+      <p className="mt-2 text-xs text-muted">
+        Shipping and any applicable charges are confirmed at checkout.
+      </p>
 
       <div className="mt-6 flex items-center justify-between gap-4">
         <button
@@ -244,7 +251,7 @@ export function CartView({ cart }: { cart: CartViewModel }) {
           className={cn(
             "rounded-md px-6 py-3 text-sm font-semibold text-white transition-colors",
             cart.canCheckout
-              ? "bg-brand-600 hover:bg-brand-700"
+              ? "bg-brand-700 hover:bg-brand-800"
               : "cursor-not-allowed bg-zinc-300 text-zinc-500",
           )}
         >

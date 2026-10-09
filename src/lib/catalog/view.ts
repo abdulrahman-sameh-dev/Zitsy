@@ -5,6 +5,7 @@ import type {
   SellableVariantRecord,
 } from "./variants";
 import { buildOptionDims, isOrderableVariant } from "./variants";
+import { toPlainText } from "./description";
 
 export interface ImageRecord {
   src: string;
@@ -138,7 +139,7 @@ export function buildProductView(product: ViewProduct): ProductViewRecord {
     id: product.id,
     slug: product.slug,
     title: product.title,
-    description: product.description,
+    description: toPlainText(product.description),
     tags: product.tags,
     currency: product.currency,
     minPriceMinor: product.minPriceMinor,

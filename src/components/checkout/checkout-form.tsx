@@ -379,7 +379,7 @@ export function CheckoutForm({
             type="button"
             onClick={startPayment}
             disabled={!canContinue}
-            className="rounded-md bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
+            className="rounded-md bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-800 disabled:opacity-60"
           >
             {starting ? "Starting payment…" : "Continue to payment"}
           </button>

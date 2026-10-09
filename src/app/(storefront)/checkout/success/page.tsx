@@ -29,7 +29,7 @@ export default async function CheckoutSuccessPage() {
         </p>
         <Link
           href="/shop"
-          className="rounded-md bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+          className="rounded-md bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
         >
           Back to shop
         </Link>
@@ -106,36 +106,50 @@ export default async function CheckoutSuccessPage() {
       </dl>
 
       {paid ? (
-        <div className="mt-6 rounded-md border border-line bg-surface px-4 py-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted">Fulfillment</span>
-            <span className="font-medium text-ink">
-              {fulfillmentLabel(order.fulfillment.status as FulfillmentStatus)}
-            </span>
-          </div>
-          {order.fulfillment.tracking.number ? (
-            <div className="mt-2 flex justify-between">
-              <span className="text-muted">Tracking</span>
+        <>
+          <div className="mt-6 rounded-md border border-line bg-surface px-4 py-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted">Fulfillment</span>
               <span className="font-medium text-ink">
-                {order.fulfillment.tracking.url ? (
-                  <a
-                    className="text-brand-600 underline"
-                    href={order.fulfillment.tracking.url}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    {order.fulfillment.tracking.carrier ?? "Track"}{" "}
-                    {order.fulfillment.tracking.number}
-                  </a>
-                ) : (
-                  `${order.fulfillment.tracking.carrier ?? ""} ${
-                    order.fulfillment.tracking.number
-                  }`.trim()
-                )}
+                {fulfillmentLabel(order.fulfillment.status as FulfillmentStatus)}
               </span>
             </div>
-          ) : null}
-        </div>
+            {order.fulfillment.tracking.number ? (
+              <div className="mt-2 flex justify-between">
+                <span className="text-muted">Tracking</span>
+                <span className="font-medium text-ink">
+                  {order.fulfillment.tracking.url ? (
+                    <a
+                      className="text-brand-700 underline"
+                      href={order.fulfillment.tracking.url}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {order.fulfillment.tracking.carrier ?? "Track"}{" "}
+                      {order.fulfillment.tracking.number}
+                    </a>
+                  ) : (
+                    `${order.fulfillment.tracking.carrier ?? ""} ${
+                      order.fulfillment.tracking.number
+                    }`.trim()
+                  )}
+                </span>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-8 rounded-md bg-canvas-deep px-5 py-4">
+            <h2 className="text-sm font-semibold text-ink">What happens next</h2>
+            <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-ink-soft">
+              <li>Your item is printed and produced to order.</li>
+              <li>We email you when it&apos;s dispatched, with live carrier tracking.</li>
+              <li>
+                Track it any time using your order number ({order.orderNumber}) and
+                email — no account needed.
+              </li>
+            </ol>
+          </div>
+        </>
       ) : null}
 
       <div className="mt-8 text-sm text-muted">
@@ -160,22 +174,25 @@ export default async function CheckoutSuccessPage() {
         </p>
       </div>
 
-      <div className="mt-10 flex flex-wrap gap-5 text-sm">
-        <Link
-          href="/shop"
-          className="font-medium text-brand-700 transition-colors hover:text-brand-800"
-        >
-          Continue shopping
-        </Link>
-        {paid ? (
-          <Link
-            href="/track-order"
-            className="font-medium text-brand-700 transition-colors hover:text-brand-800"
-          >
+      {paid ? (
+        <div className="mt-10 flex flex-wrap gap-3">
+          <Link href="/track-order" className="btn-primary">
             Track your order
           </Link>
-        ) : null}
-      </div>
+          <Link href="/shop" className="btn-secondary">
+            Continue shopping
+          </Link>
+        </div>
+      ) : (
+        <div className="mt-10 flex flex-wrap items-center gap-3">
+          <Link href="/shop" className="btn-primary">
+            Continue shopping
+          </Link>
+          <p className="text-xs text-muted">
+            Tracking will be available once payment completes.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

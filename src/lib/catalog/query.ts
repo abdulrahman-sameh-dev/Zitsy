@@ -101,6 +101,27 @@ export async function getFeaturedProducts(
     .slice(0, limit);
 }
 
+/**
+ * A deliberately chosen product for hero placement. Null when the slug is not
+ * a visible product, so callers fall back to the computed featured set.
+ */
+export async function getHeroProductSummary(
+  slug: string,
+): Promise<ProductSummary | null> {
+  const product = await db.product.findFirst({
+    where: { slug, visible: true },
+    select: {
+      slug: true,
+      title: true,
+      minPriceMinor: true,
+      currency: true,
+      tags: true,
+      images: { take: 1, orderBy: [{ isDefault: "desc" }, { position: "asc" }] },
+    },
+  });
+  return product ? toSummary(product) : null;
+}
+
 export async function getCategorySummaries(): Promise<
   Array<CategorySummary & { imageSrc: string | null }>
 > {

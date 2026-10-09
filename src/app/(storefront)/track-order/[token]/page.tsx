@@ -31,35 +31,44 @@ export const metadata = {
 
 function Steps({ steps }: { steps: TrackingView["steps"] }) {
   return (
-    <ol className="mt-6 flex flex-col gap-3">
-      {steps.map((step) => (
-        <li key={step.key} className="flex items-start gap-3 text-sm">
-          <span
-            aria-hidden
-            className={
-              step.state === "done"
-                ? "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[11px] font-bold text-white"
-                : step.state === "current"
-                  ? "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-brand-600 bg-surface"
-                  : "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line bg-surface"
-            }
-          >
-            {step.state === "done" ? "✓" : ""}
-          </span>
-          <span
-            className={
-              step.state === "todo" ? "text-muted" : "font-medium text-ink"
-            }
-          >
-            {step.label}
-            {step.at ? (
-              <span className="block text-xs font-normal text-muted">
-                {DATE_FORMAT.format(step.at)}
-              </span>
+    <ol className="mt-6 flex flex-col gap-1">
+      {steps.map((step, index) => {
+        const isLast = index === steps.length - 1;
+        return (
+          <li key={step.key} className="relative flex items-start gap-3 pb-0.5 text-sm">
+            {!isLast ? (
+              <span
+                aria-hidden="true"
+                className="absolute left-3 top-6 bottom-1 w-px bg-line"
+              />
             ) : null}
-          </span>
-        </li>
-      ))}
+            <span
+              aria-hidden
+              className={
+                step.state === "done"
+                  ? "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white"
+                  : step.state === "current"
+                    ? "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-brand-700 bg-surface"
+                    : "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line bg-surface"
+              }
+            >
+              {step.state === "done" ? "✓" : ""}
+            </span>
+            <span
+              className={
+                step.state === "todo" ? "text-muted" : "font-medium text-ink"
+              }
+            >
+              {step.label}
+              {step.at ? (
+                <span className="block text-xs font-normal text-muted">
+                  {DATE_FORMAT.format(step.at)}
+                </span>
+              ) : null}
+            </span>
+          </li>
+        );
+      })}
     </ol>
   );
 }

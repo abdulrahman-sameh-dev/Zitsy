@@ -1,25 +1,39 @@
 @import "tailwindcss";
 
 @theme {
+  /* Zitsy brand — Tailwind CSS v4 green scale (uicolors.app/tailwind-colors/green).
+     green-600/700 are the action shades; deep greens anchor premium bands. */
   --color-brand-50: #f0fdf4;
   --color-brand-100: #dcfce7;
-  --color-brand-200: #bbf7d0;
-  --color-brand-300: #86efac;
-  --color-brand-400: #4ade80;
-  --color-brand-500: #22c55e;
-  --color-brand-600: #16a34a;
-  --color-brand-700: #15803d;
-  --color-brand-800: #166534;
-  --color-brand-900: #14532d;
+  --color-brand-200: #b9f8cf;
+  --color-brand-300: #7bf1a8;
+  --color-brand-400: #05df72;
+  --color-brand-500: #00c950;
+  --color-brand-600: #00a63e;
+  --color-brand-700: #008236;
+  --color-brand-800: #016630;
+  --color-brand-900: #0d542b;
+  --color-brand-950: #032e15;
 
-  --color-canvas: #fafafa;
+  /* Warm paper neutrals — editorial foundation for graphic apparel.
+     Surfaces stay white / subtly tinted so product artwork leads. */
+  --color-canvas: #f6f4ef;
+  --color-canvas-deep: #ece9e1;
   --color-surface: #ffffff;
-  --color-ink: #18181b;
-  --color-muted: #71717a;
-  --color-line: #e4e4e7;
+  --color-ink: #141412;
+  --color-ink-soft: #3d3c38;
+  --color-muted: #6b6a63;
+  --color-muted-light: #c9c6bd;
+  --color-line: #e3e0d8;
+  --color-line-strong: #d2cec2;
+
+  /* Deep brand-dark bands (footer, contrast sections). */
+  --color-card-dark: #043019;
+  --color-card-dark-line: #0c4a28;
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -29,6 +43,7 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -39,13 +54,27 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-brand-600);
+    outline: 2px solid var(--color-brand-700);
     outline-offset: 2px;
   }
 
   ::selection {
     background: var(--color-brand-100);
     color: var(--color-brand-900);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -56,5 +85,60 @@
 
   .skip-link {
     @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-brand-700 focus:px-4 focus:py-2 focus:text-sm focus:text-white;
+  }
+
+  .btn-primary {
+    /* green-700 keeps white text at 4.95:1 (WCAG AA) with a true brand fill. */
+    @apply inline-flex items-center justify-center rounded-md bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-800;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-line-strong bg-surface px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-brand-500 hover:bg-brand-50 hover:text-brand-800;
+  }
+
+  .btn-ghost-light {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-canvas transition-colors hover:bg-white/10;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink transition-colors hover:border-brand-500 hover:text-brand-800;
+  }
+
+  .chip-active {
+    @apply inline-flex items-center rounded-full border border-brand-700 bg-brand-700 px-3.5 py-1.5 text-sm font-medium text-white;
+  }
+
+  /* Long-form copy (policy and information pages). */
+  .prose-doc {
+    @apply max-w-2xl text-[15px] leading-7 text-ink-soft;
+  }
+
+  .prose-doc h2 {
+    @apply mt-10 text-xl font-semibold tracking-tight text-ink;
+  }
+
+  .prose-doc h3 {
+    @apply mt-6 text-base font-semibold text-ink;
+  }
+
+  .prose-doc p {
+    @apply mt-3;
+  }
+
+  .prose-doc ul,
+  .prose-doc ol {
+    @apply mt-3 list-disc space-y-1.5 pl-5;
+  }
+
+  .prose-doc ol {
+    list-style-type: decimal;
+  }
+
+  .prose-doc a {
+    @apply font-medium text-brand-700 underline decoration-brand-300 underline-offset-2 hover:text-brand-800;
+  }
+
+  .prose-doc strong {
+    @apply font-semibold text-ink;
   }
 }

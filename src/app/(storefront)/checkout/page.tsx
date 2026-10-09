@@ -1,11 +1,14 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { connection } from "next/server";
 
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { loadCartView } from "@/lib/cart/read";
 import { paypalClientId } from "@/lib/config/env";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Checkout",
+  description: "Enter your delivery details and pay securely with PayPal.",
   robots: { index: false, follow: false },
 };
 
@@ -22,12 +25,9 @@ export default async function CheckoutPage() {
         <p className="max-w-md text-sm leading-relaxed text-muted">
           Add something to your cart before checking out.
         </p>
-        <a
-          href="/shop"
-          className="rounded-md bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-        >
+        <Link href="/shop" className="btn-primary">
           Browse products
-        </a>
+        </Link>
       </div>
     );
   }
@@ -42,12 +42,9 @@ export default async function CheckoutPage() {
           Some items are unavailable or have changed. Please review your cart to
           continue.
         </p>
-        <a
-          href="/cart"
-          className="rounded-md bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-        >
+        <Link href="/cart" className="btn-primary">
           Review cart
-        </a>
+        </Link>
       </div>
     );
   }
@@ -61,7 +58,8 @@ export default async function CheckoutPage() {
         Checkout
       </h1>
       <p className="mt-2 text-sm text-muted">
-        Enter your delivery details, then pay securely with PayPal.
+        Enter your delivery details, then pay securely with PayPal. Shipping is
+        confirmed as part of checkout.
       </p>
       <div className="mt-8">
         <CheckoutForm

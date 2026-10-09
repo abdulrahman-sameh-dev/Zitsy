@@ -14,7 +14,7 @@ export default function TrackOrderNotFound() {
       <div className="flex flex-wrap justify-center gap-3">
         <Link
           href="/track-order"
-          className="rounded-md bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+          className="rounded-md bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
         >
           Track my order
         </Link>
